@@ -23,6 +23,10 @@ def webhook():
         data = request.get_json()
         if not data:
             return jsonify({"status": "error"}), 400
+            # === ВРЕМЕННЫЙ ДЕБАГ ===
+        print("=== ПОЛНЫЕ ДАННЫЕ ===")
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        # === ВРЕМЕННЫЙ ДЕБАГ ===
 
         test_name = data.get('testName', 'Неизвестный тест')
         student_id = data.get('id', '—')
