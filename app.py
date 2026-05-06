@@ -27,7 +27,7 @@ def webhook():
         test_name = data.get('testName', 'Неизвестный тест')
         student_id = data.get('id', '—')
         
-        # Извлекаем результаты
+        # === ИЗВЛЕКАЕМ РЕЗУЛЬТАТЫ ===
         results = data.get('results', [])
         
         score = "—"
@@ -35,19 +35,23 @@ def webhook():
         
         for r in results:
             name = r.get('name', '').lower()
+            value = r.get('value', '—')
             
-            if any(x in name for x in ['балл', 'правильн', 'количеств']):
-                score = r.get('value', '—')
-            elif any(x in name for x in ['процент', 'percent']):
-                percent = r.get('value', '—')
+            # Баллы
+            if any(word in name for word in ['балл', 'правильн', 'количеств', 'набранных']):
+                score = value
+            
+            # Процент
+            if any(word in name for word in ['процент', 'percent', '%']):
+                percent = value
 
         # Формируем сообщение
-        message = f"✅ Новый результат теста✅\n\n" \
+        message = f"✅ **Новый результат теста** ✅\n\n" \
                   f"#тест\n" \
-                  f"Тест: {test_name}\n" \
-                  f"Участник ID: {student_id}\n" \
-                  f"Баллы: {score}\n" \
-                  f"Процент: {percent}%\n"
+                  f"**Тест:** {test_name}\n" \
+                  f"**Участник ID:** {student_id}\n" \
+                  f"**Баллы:** {score}\n" \
+                  f"**Процент:** {percent}%\n"
 
         # Добавляем ник
         regparams = data.get('regparams', [])
@@ -66,7 +70,6 @@ def webhook():
         }
 
         response = requests.post(vk_url, params=params)
-
         return jsonify({"status": "ok"}), 200
 
     except Exception as e:
