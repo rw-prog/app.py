@@ -27,9 +27,8 @@ def webhook():
         test_name = data.get('testName', 'Неизвестный тест')
         student_id = data.get('id', '—')
         
-        # === ИЗВЛЕКАЕМ РЕЗУЛЬТАТЫ ===
+        # Извлечение результатов
         results = data.get('results', [])
-        
         score = "—"
         percent = "—"
         
@@ -37,27 +36,44 @@ def webhook():
             name = r.get('name', '').lower()
             value = r.get('value', '—')
             
-            # Баллы
             if any(word in name for word in ['балл', 'правильн', 'количеств', 'набранных']):
                 score = value
-            
-            # Процент
             if any(word in name for word in ['процент', 'percent', '%']):
                 percent = value
 
-        # Формируем сообщение
-        message = f"✅ **Новый результат теста** ✅\n\n" \
-                  f"#тест\n" \
-                  f"Тест: {test_name}\n" \
-                  f"Участник ID: {student_id}\n" \
-                  f"Баллы: {score}\n" \
-                  f"Процент: {percent}%\n"
+        # === ВРЕМЯ ПРОХОЖДЕНИЯ ===
+        duration = "—"
+        
+        # Пытаемся найти время в разных возможных полях
+        if 'time' in data or 'duration' in data or 'spent' in data:
+            duration = data.get('time') or data.get('duration') or data.get('spent')
+        
+        # Если время есть в results (иногда бывает)
+        for r in results:
+            name = r.get('name', '').lower()
+            if any(word in name for word in ['время', 'time', 'минут', 'секунд', 'duration']):
+                duration = r.get('value', '—')
+                break
 
         # Добавляем ник
+        nickname = "—"
         regparams = data.get('regparams', [])
         for p in regparams:
             if p.get('name') == "Ник" and p.get('value'):
-                message += f"Ник: {p.get('value')}\n"
+                nickname = p.get('value')
+
+        # Текущее время (когда пришёл результат)
+        current_time = time.strftime("%d.%m.%Y %H:%M")
+
+        # Красивое сообщение
+        message = f"✅ **Новый результат теста** ✅\n\n" \
+                  f"#тест\n" \
+                  f"Тест: {test_name}\n" \
+                  f"*Ник: {nickname}\n" \
+                  f"Баллы: {score}\n" \
+                  f"Процент: {percent}%\n" \
+                  f"Время прохождения: {duration}\n" \
+                  f"Отправлено: {current_time}\n"
 
         # Отправка в ВК
         vk_url = "https://api.vk.com/method/messages.send"
@@ -69,7 +85,7 @@ def webhook():
             "v": "5.199"
         }
 
-        response = requests.post(vk_url, params=params)
+        requests.post(vk_url, params=params)
         return jsonify({"status": "ok"}), 200
 
     except Exception as e:
