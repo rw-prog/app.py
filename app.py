@@ -48,16 +48,16 @@ def webhook():
         # Формируем сообщение
         message = f"✅ **Новый результат теста** ✅\n\n" \
                   f"#тест\n" \
-                  f"**Тест:** {test_name}\n" \
-                  f"**Участник ID:** {student_id}\n" \
-                  f"**Баллы:** {score}\n" \
-                  f"**Процент:** {percent}%\n"
+                  f"Тест: {test_name}\n" \
+                  f"Участник ID: {student_id}\n" \
+                  f"Баллы: {score}\n" \
+                  f"Процент: {percent}%\n"
 
         # Добавляем ник
         regparams = data.get('regparams', [])
         for p in regparams:
             if p.get('name') == "Ник" and p.get('value'):
-                message += f"**Ник:** {p.get('value')}\n"
+                message += f"Ник: {p.get('value')}\n"
 
         # Отправка в ВК
         vk_url = "https://api.vk.com/method/messages.send"
