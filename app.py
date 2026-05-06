@@ -24,7 +24,6 @@ def webhook():
         if not data:
             return jsonify({"status": "error"}), 400
 
-        # Основная информация
         test_name = data.get('testName', 'Неизвестный тест')
         student_id = data.get('id', '—')
         
@@ -33,25 +32,28 @@ def webhook():
         
         score = "—"
         percent = "—"
+        
         for r in results:
-            name = r.get('name', '')
-            if any(x in name for x in ['баллов', 'правильных ответов', 'Количество']):
+            name = r.get('name', '').lower()
+            
+            if any(x in name for x in ['балл', 'правильн', 'количеств']):
                 score = r.get('value', '—')
-            elif 'Процент' in name:
+            elif any(x in name for x in ['процент', 'percent']):
                 percent = r.get('value', '—')
 
-        # Формируем красивое сообщение
-        message = f"✅ Новый результат теста\n\n" \
+        # Формируем сообщение
+        message = f"✅ Новый результат теста✅\n\n" \
+                  f"#тест\n" \
                   f"Тест: {test_name}\n" \
-                  f"Участник ID:  {student_id}\n" \
+                  f"Участник ID: {student_id}\n" \
                   f"Баллы: {score}\n" \
                   f"Процент: {percent}%\n"
 
-        # Добавляем ник, если есть
+        # Добавляем ник
         regparams = data.get('regparams', [])
         for p in regparams:
             if p.get('name') == "Ник" and p.get('value'):
-                message += f"Ник: {p.get('value')}\n"
+                message += f"**Ник:** {p.get('value')}\n"
 
         # Отправка в ВК
         vk_url = "https://api.vk.com/method/messages.send"
@@ -64,14 +66,9 @@ def webhook():
         }
 
         response = requests.post(vk_url, params=params)
-        print("VK response:", response.json())
 
         return jsonify({"status": "ok"}), 200
 
     except Exception as e:
         print("Error:", str(e))
         return jsonify({"status": "error"}), 500
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
