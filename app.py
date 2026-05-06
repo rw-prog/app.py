@@ -8,7 +8,7 @@ app = Flask(__name__)
 # === НАСТРОЙКИ ===
 VK_TOKEN = "vk1.a.begJge3Zca-Xza97op_HJtuhNuuprZCl0kyCRRq6ZFGMetF3qpfW3DIDmwXDn8tO_fZ3B4LU6ulJZEJtOvQ_pM_Xa5Z03E_w68RKoJ-e3jXPUC4RzSPQq6AGpzspqPlheAAtngkuPN-HvsNnTgS-PI2n_n0bS9V8o1n9deecNbJY13pzg7NfE2pvgun1lj_Er_O5bPHFMDvKpZmAt2ovtw"  # ← обязательно в кавычках!
 
-PEER_ID = 2000000520
+PEER_ID = 2000000641
 
 VERIFY_STRING = "xsrv3r6zj2d5w"   # ← тоже в кавычках!
 
