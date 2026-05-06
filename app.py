@@ -52,7 +52,7 @@ def webhook():
         current_time = time.strftime("%d.%m.%Y %H:%M")
 
         # Финальное сообщение
-        message = f"✅ **Новый результат теста** ✅\n\n" \
+        message = f"✅ Новый результат теста ✅\n\n" \
                   f"#тест\n" \
                   f"Тест: {test_name}\n" \
                   f"Ник: {nickname}\n" \
