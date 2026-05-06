@@ -19,28 +19,39 @@ def verify():
 
 @app.route('/', methods=['POST'])
 def webhook():
-    """Приём результатов теста"""
     try:
         data = request.get_json()
         if not data:
-            return jsonify({"status": "error", "message": "No JSON"}), 400
+            return jsonify({"status": "error"}), 400
 
         # Основная информация
         test_name = data.get('testName', 'Неизвестный тест')
         student_id = data.get('id', '—')
         
-        # Результаты
+        # Извлекаем результаты
         results = data.get('results', [])
-        score = next((r['value'] for r in results if 'правильных ответов' in r.get('name', '')), '—')
-        percent = next((r['value'] for r in results if 'Процент' in r.get('name', '')), '—')
+        
+        score = "—"
+        percent = "—"
+        for r in results:
+            name = r.get('name', '')
+            if any(x in name for x in ['баллов', 'правильных ответов', 'Количество']):
+                score = r.get('value', '—')
+            elif 'Процент' in name:
+                percent = r.get('value', '—')
 
         # Формируем красивое сообщение
         message = f"✅ **Новый результат теста**\n\n" \
                   f"**Тест:** {test_name}\n" \
                   f"**Участник ID:** {student_id}\n" \
-                  f"**Правильных ответов:** {score}\n" \
-                  f"**Процент:** {percent}%\n\n" \
-                  f"Полные данные: {json.dumps(data, ensure_ascii=False, indent=2)[:500]}..."  # можно убрать
+                  f"**Баллы:** {score}\n" \
+                  f"**Процент:** {percent}%\n"
+
+        # Добавляем ник, если есть
+        regparams = data.get('regparams', [])
+        for p in regparams:
+            if p.get('name') == "Ник" and p.get('value'):
+                message += f"**Ник:** {p.get('value')}\n"
 
         # Отправка в ВК
         vk_url = "https://api.vk.com/method/messages.send"
@@ -48,18 +59,17 @@ def webhook():
             "access_token": VK_TOKEN,
             "peer_id": PEER_ID,
             "message": message,
-            "random_id": int(__import__('time').time() * 1000),
+            "random_id": int(time.time() * 1000),
             "v": "5.199"
         }
 
         response = requests.post(vk_url, params=params)
-        vk_result = response.json()
+        print("VK response:", response.json())
 
-        print("VK response:", vk_result)  # для отладки
         return jsonify({"status": "ok"}), 200
 
     except Exception as e:
-        print("Error:", e)
+        print("Error:", str(e))
         return jsonify({"status": "error"}), 500
 
 
