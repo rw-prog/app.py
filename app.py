@@ -1,13 +1,16 @@
 from flask import Flask, request, jsonify
 import requests
 import json
+import time   # добавь эту строку
 
 app = Flask(__name__)
 
 # === НАСТРОЙКИ ===
-VK_TOKEN = vk1.a.begJge3Zca-Xza97op_HJtuhNuuprZCl0kyCRRq6ZFGMetF3qpfW3DIDmwXDn8tO_fZ3B4LU6ulJZEJtOvQ_pM_Xa5Z03E_w68RKoJ-e3jXPUC4RzSPQq6AGpzspqPlheAAtngkuPN-HvsNnTgS-PI2n_n0bS9V8o1n9deecNbJY13pzg7NfE2pvgun1lj_Er_O5bPHFMDvKpZmAt2ovtw          # ← Замени
-PEER_ID = 2000000520                           # ← peer_id твоей беседы
-VERIFY_STRING = xsrv3r6zj2d5w                # из скриншота
+VK_TOKEN = "vk1.a.begJge3Zca-Xza97op_HJtuhNuuprZCl0kyCRRq6ZFGMetF3qpfW3DIDmwXDn8tO_fZ3B4LU6ulJZEJtOvQ_pM_Xa5Z03E_w68RKoJ-e3jXPUC4RzSPQq6AGpzspqPlheAAtngkuPN-HvsNnTgS-PI2n_n0bS9V8o1n9deecNbJY13pzg7NfE2pvgun1lj_Er_O5bPHFMDvKpZmAt2ovtw"  # ← обязательно в кавычках!
+
+PEER_ID = 2000000520
+
+VERIFY_STRING = "xsrv3r6zj2d5w"   # ← тоже в кавычках!
 
 @app.route('/', methods=['GET'])
 def verify():
