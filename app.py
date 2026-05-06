@@ -23,10 +23,6 @@ def webhook():
         data = request.get_json()
         if not data:
             return jsonify({"status": "error"}), 400
-            # === ВРЕМЕННЫЙ ДЕБАГ ===
-        print("=== ПОЛНЫЕ ДАННЫЕ ===")
-        print(json.dumps(data, ensure_ascii=False, indent=2))
-        # === ВРЕМЕННЫЙ ДЕБАГ ===
 
         test_name = data.get('testName', 'Неизвестный тест')
         student_id = data.get('id', '—')
@@ -45,39 +41,23 @@ def webhook():
             if any(word in name for word in ['процент', 'percent', '%']):
                 percent = value
 
-        # === ВРЕМЯ ПРОХОЖДЕНИЯ ===
-        duration = "—"
-        
-        # Пытаемся найти время в разных возможных полях
-        if 'time' in data or 'duration' in data or 'spent' in data:
-            duration = data.get('time') or data.get('duration') or data.get('spent')
-        
-        # Если время есть в results (иногда бывает)
-        for r in results:
-            name = r.get('name', '').lower()
-            if any(word in name for word in ['время', 'time', 'минут', 'секунд', 'duration']):
-                duration = r.get('value', '—')
-                break
-
-        # Добавляем ник
+        # Ник участника
         nickname = "—"
         regparams = data.get('regparams', [])
         for p in regparams:
             if p.get('name') == "Ник" and p.get('value'):
                 nickname = p.get('value')
 
-        # Текущее время (когда пришёл результат)
+        # Текущее время
         current_time = time.strftime("%d.%m.%Y %H:%M")
 
-        # Красивое сообщение
+        # Финальное сообщение
         message = f"✅ **Новый результат теста** ✅\n\n" \
                   f"#тест\n" \
                   f"Тест: {test_name}\n" \
-                  f"*Ник: {nickname}\n" \
+                  f"Ник: {nickname}\n" \
                   f"Баллы: {score}\n" \
-                  f"Процент: {percent}%\n" \
-                  f"Время прохождения: {duration}\n" \
-                  f"Отправлено: {current_time}\n"
+                  f"Процент: {percent}%\n"
 
         # Отправка в ВК
         vk_url = "https://api.vk.com/method/messages.send"
